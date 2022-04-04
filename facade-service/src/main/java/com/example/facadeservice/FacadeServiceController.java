@@ -8,17 +8,22 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 @RestController
 public class FacadeServiceController {
 
-    private  WebClient loggingWebService = WebClient.create("http://localhost:8081");
-    private  WebClient messagesWebService = WebClient.create("http://localhost:8082");
+    private final  List<WebClient> loggingWebService = List.of(WebClient.create("http://localhost:8081"),
+            WebClient.create("http://localhost:8083"),
+            WebClient.create("http://localhost:8084")
+    );
+    private final  WebClient messagesWebService = WebClient.create("http://localhost:8082");
 
     @GetMapping("/facade-service")
     public String getMsg(){
-        String loggingServiceMsg = loggingWebService.get()
+        String loggingServiceMsg = loggingWebService.get(0/*new Random().nextInt(2)*/).get()
                 .uri("/logging-service").retrieve()
                 .bodyToMono(String.class)
                 .block();
@@ -32,7 +37,7 @@ public class FacadeServiceController {
     @PostMapping("/facade-service")
     public Mono<Void> redirectMsg(@RequestBody String msg){
         String[] uuidMsg = {UUID.randomUUID().toString(), msg};
-        return loggingWebService.post()
+        return loggingWebService.get(0/*new Random().nextInt(2)*/).post()
                 .uri("/logging-service")
                 .contentType(MediaType.APPLICATION_JSON).bodyValue(uuidMsg)
                 .retrieve()

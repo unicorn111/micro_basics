@@ -1,5 +1,7 @@
 package com.example.loggingservice;
 
+import com.hazelcast.core.Hazelcast;
+import com.hazelcast.core.HazelcastInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,14 +11,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 
 @RestController
 public class LoggingServiceController {
 
     private Logger logger = LoggerFactory.getLogger(LoggingServiceController.class);
-    private Map<UUID, String> messages = new ConcurrentHashMap<>();
+    private HazelcastInstance hz = Hazelcast.newHazelcastInstance();
+    private Map<UUID, String> messages = hz.getMap("messages");
 
     @GetMapping("/logging-service")
     public String returnMsg(){
