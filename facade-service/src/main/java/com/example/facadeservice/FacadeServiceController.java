@@ -23,7 +23,7 @@ public class FacadeServiceController {
 
     @GetMapping("/facade-service")
     public String getMsg(){
-        String loggingServiceMsg = loggingWebService.get(0/*new Random().nextInt(2)*/).get()
+        String loggingServiceMsg = loggingWebService.get(new Random().nextInt(3)).get()
                 .uri("/logging-service").retrieve()
                 .bodyToMono(String.class)
                 .block();
@@ -37,7 +37,7 @@ public class FacadeServiceController {
     @PostMapping("/facade-service")
     public Mono<Void> redirectMsg(@RequestBody String msg){
         String[] uuidMsg = {UUID.randomUUID().toString(), msg};
-        return loggingWebService.get(0/*new Random().nextInt(2)*/).post()
+        return loggingWebService.get(new Random().nextInt(3)).post()
                 .uri("/logging-service")
                 .contentType(MediaType.APPLICATION_JSON).bodyValue(uuidMsg)
                 .retrieve()
