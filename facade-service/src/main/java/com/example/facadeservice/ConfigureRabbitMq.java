@@ -6,29 +6,29 @@ import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class ConfigureRabbitMq {
 
-    public static final String QUEUE_NAME = "myQueue";
-    public static final String EXCHANGE_NAME = "myTopicExchange";
-    public static final String ROUTING_KEY = "myRoutingKey.#";
+    @Autowired
+    private ApplicationConfig config;
 
     @Bean
     Queue createQueue() {
-        return new Queue(QUEUE_NAME, false);
+        return new Queue(config.getMyQueue(), false);
     }
 
     @Bean
     TopicExchange exchange() {
-        return new TopicExchange(EXCHANGE_NAME);
+        return new TopicExchange(config.getExName().substring(1, config.getExName().length() - 1));
     }
 
     @Bean
     Binding binding(Queue queue, TopicExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with(ROUTING_KEY);
+        return BindingBuilder.bind(queue).to(exchange).with(config.getRoutingKey().substring(1, config.getRoutingKey().length() - 1));
     }
 
     @Bean
